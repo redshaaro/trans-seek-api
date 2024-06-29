@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = "postgresql://postgres.vfsxkowhkqovscbfxghy:l5N97uzp8xCQPFgN@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+  directUrl = "postgresql://postgres.vfsxkowhkqovscbfxghy:l5N97uzp8xCQPFgN@aws-0-eu-central-1.pooler.supabase.com:5432/postgres"
+}
+
+model Exporter {
+  id           Int        @id @default(autoincrement())
+  username     String     @unique
+  email        String     @unique
+  password     String
+  companyName  String
+  typeOfGoods  String
+  country      String
+  phoneNumber  String
+  isSubscribed Boolean    @default(false)
+  shipments    Shipment[]
+}
+
+model FreightForwarder {
+  id           Int        @id @default(autoincrement())
+  username     String     @unique
+  email        String     @unique
+  password     String
+  companyName  String
+  country      String
+  phoneNumber  String
+  experience   String
+  isSubscribed Boolean    @default(false)
+  shipments    Shipment[]
+  products     Product[]
+}
+
+model Shipment {
+  id             Int               @id @default(autoincrement())
+  origin         String
+  destination    String
+  dateOfDispatch DateTime
+  timeToShip     Int // in hours
+  price          Float
+  weight         Float
+  dateOfArrival  DateTime
+  exporterId     Int?
+  forwarderId    Int?
+  exporter       Exporter?         @relation(fields: [exporterId], references: [id])
+  forwarder      FreightForwarder? @relation(fields: [forwarderId], references: [id])
+}
+
+model ShipmentsOrderedByUser {
+  id         Int @id @default(autoincrement())
+  userId     Int
+  shipmentId Int
+}
+
+model Product {
+  id                 Int              @id @default(autoincrement())
+  name               String
+  description        String
+  weight             Float
+  productType        String
+  country            String
+  freightForwarderId Int
+  freightForwarder   FreightForwarder @relation(fields: [freightForwarderId], references: [id])
+}
+
+model Truck {
+  id       Int    @id @default(autoincrement())
+  location String
+  email    String
+  phoneNo  String
+}
+
+model Warehouse {
+  id        Int    @id @default(autoincrement())
+  name      String
+  location  String
+  capacity  Int
+  inventory Int
+  email     String
+  phoneNo   String
+}
