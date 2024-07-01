@@ -13,7 +13,7 @@ const generateToken = (user) => {
 };
 
 // Signup function for Exporter
-exports.exporterSignup = async (req, res) => {
+exports.exporterSignup = async (Areq, res) => {
   const { username, email, password, companyName, typeOfGoods, country, phoneNumber } = req.body;
 
   try {
@@ -87,7 +87,9 @@ exports.login = async (req, res) => {
     }
 
     const token = generateToken(user);
-    res.json({ token, user });
+    // Remove password before sending response
+    const { password: userPassword, ...userData } = user;
+    res.json({ token, user: userData });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
